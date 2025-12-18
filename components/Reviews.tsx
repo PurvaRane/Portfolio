@@ -89,7 +89,7 @@ const Reviews: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition"
-                placeholder="John Doe"
+                placeholder="First Last"
               />
             </div>
 
@@ -102,7 +102,7 @@ const Reviews: React.FC = () => {
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-blue-500 transition"
-                placeholder="Software Engineer at Company"
+                placeholder="Role/Position"
               />
             </div>
 

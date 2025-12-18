@@ -11,13 +11,28 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'https://purvaraneportfolio.vercel.app'
-  ],
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allowed origins
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://purvaraneportfolio.vercel.app'
+    ];
+    
+    // Check if origin is in the allowed list or is a Vercel preview URL
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 // Explicitly handle preflight requests
@@ -164,6 +179,8 @@ app.post('/api/reviews', async (req, res) => {
 
     await review.save();
     
+    console.log(`📝 New review submitted by ${name} (Pending Approval)`);
+
     res.json({ 
       success: true, 
       message: 'Review submitted successfully. It will appear after approval.' 

@@ -16,6 +16,8 @@ export const submitReview = async (data: ReviewData): Promise<boolean> => {
       return false;
     }
 
+    console.log('🚀 Submitting review to:', `${API_URL}/api/reviews`);
+
     const response = await fetch(`${API_URL}/api/reviews`, {
       method: 'POST',
       headers: {
