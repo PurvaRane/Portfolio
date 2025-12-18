@@ -6,104 +6,101 @@ import Analytics from './models/Analytics.js';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-/* =========================
-   CORS — PRODUCTION FIX
-   ========================= */
+/* ================================
+   ✅ CORS — FINAL, BULLETPROOF
+================================ */
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Allowed domains (localhost + production)
-    const allowedDomains = [
-      'http://localhost:5173',
-      'http://localhost:3000'
-    ];
-    
-    // Check if origin is in allowedDomains or is a Vercel deployment
-    const isAllowed = allowedDomains.includes(origin) || origin.endsWith('.vercel.app');
-    
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      console.log('❌ Blocked by CORS:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true,               // allow all origins (safe for portfolio)
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type'],
 }));
 
-// Explicitly handle preflight requests
+// IMPORTANT: handle preflight explicitly
 app.options('*', cors());
 
 app.use(express.json());
 
-/* =========================
-   MongoDB Connection
-   ========================= */
+/* ================================
+   MongoDB
+================================ */
 const connectDB = async () => {
   try {
     if (!process.env.MONGODB_URI) {
-      console.error('❌ MONGODB_URI is missing in environment variables');
+      console.log('⚠️ MongoDB URI missing');
       return;
     }
-    
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ MongoDB connected successfully');
+    console.log('✅ MongoDB connected');
   } catch (err) {
-    console.error('❌ MongoDB connection error:', err.message);
-    // Don't exit process, allow server to run (analytics might fail but site shouldn't crash)
+    console.error('❌ MongoDB error:', err.message);
   }
 };
 
 connectDB();
 
-/* =========================
-   ROUTES
-   ========================= */
+/* ================================
+   Health
+================================ */
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+/* ================================
+   Analytics
+================================ */
 app.post('/api/analytics/view', async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
-      return res.status(200).json({ success: false });
+      return res.status(503).json({ success: false });
     }
 
-    const data = new Analytics({
+    const analytics = new Analytics({
       page: req.body.page || 'home',
       userAgent: req.headers['user-agent'] || '',
       referrer: req.headers.referer || '',
       screenWidth: req.body.screenWidth || 0,
       screenHeight: req.body.screenHeight || 0,
-      ipAddress: req.ip
+      ipAddress: req.ip,
     });
 
-    await data.save();
+    await analytics.save();
     res.json({ success: true });
   } catch (err) {
+    console.error('Analytics error:', err.message);
     res.status(500).json({ success: false });
   }
 });
 
-/* ===== Reviews ===== */
+/* ================================
+   Reviews
+================================ */
 app.post('/api/reviews', async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
-      return res.status(200).json({ success: false });
+      return res.status(503).json({ success: false });
+    }
+
+    const { name, role, message, rating } = req.body;
+    if (!name || !message) {
+      return res.status(400).json({ success: false });
     }
 
     const Review = (await import('./models/Review.js')).default;
-    await new Review(req.body).save();
+
+    await new Review({
+      name,
+      role,
+      message,
+      rating: rating || 5,
+      approved: false,
+    }).save();
 
     res.json({ success: true });
   } catch (err) {
+    console.error('Review error:', err.message);
     res.status(500).json({ success: false });
   }
 });
@@ -111,16 +108,16 @@ app.post('/api/reviews', async (req, res) => {
 app.get('/api/reviews', async (req, res) => {
   try {
     const Review = (await import('./models/Review.js')).default;
-    const data = await Review.find({ approved: true });
-    res.json({ success: true, data });
-  } catch {
-    res.json({ success: true, data: [] });
+    const reviews = await Review.find({ approved: true }).sort({ timestamp: -1 });
+    res.json({ success: true, data: reviews });
+  } catch (err) {
+    res.status(500).json({ success: false });
   }
 });
 
-/* =========================
-   START SERVER
-   ========================= */
+/* ================================
+   Start
+================================ */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
