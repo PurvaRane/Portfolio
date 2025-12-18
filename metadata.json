@@ -1,0 +1,8 @@
+{
+  "name": "Purva Rane Portfolio",
+  "description": "Professional and dynamic portfolio for Purva Rane, a B.Tech Computer Science student specializing in AI, Full-Stack Development, and Cybersecurity.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
