@@ -7,18 +7,22 @@ import Analytics from './models/Analytics.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 /* ================================
-   ✅ CORS — FINAL, BULLETPROOF
+   🔑 TRUST RENDER PROXY
+================================ */
+app.set('trust proxy', 1);
+
+/* ================================
+   ✅ CORS — RENDER + VERCEL SAFE
 ================================ */
 app.use(cors({
-  origin: true,               // allow all origins (safe for portfolio)
+  origin: true, // allow all origins
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 }));
 
-// IMPORTANT: handle preflight explicitly
+// Handle preflight requests
 app.options('*', cors());
 
 app.use(express.json());
@@ -26,23 +30,24 @@ app.use(express.json());
 /* ================================
    MongoDB
 ================================ */
-const connectDB = async () => {
+async function connectDB() {
   try {
     if (!process.env.MONGODB_URI) {
-      console.log('⚠️ MongoDB URI missing');
+      console.log('⚠️ MongoDB URI not set');
       return;
     }
+
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB connected');
   } catch (err) {
-    console.error('❌ MongoDB error:', err.message);
+    console.error('❌ MongoDB connection error:', err.message);
   }
-};
+}
 
 connectDB();
 
 /* ================================
-   Health
+   Health Check
 ================================ */
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -57,19 +62,18 @@ app.post('/api/analytics/view', async (req, res) => {
       return res.status(503).json({ success: false });
     }
 
-    const analytics = new Analytics({
+    await new Analytics({
       page: req.body.page || 'home',
       userAgent: req.headers['user-agent'] || '',
       referrer: req.headers.referer || '',
       screenWidth: req.body.screenWidth || 0,
       screenHeight: req.body.screenHeight || 0,
       ipAddress: req.ip,
-    });
+    }).save();
 
-    await analytics.save();
     res.json({ success: true });
   } catch (err) {
-    console.error('Analytics error:', err.message);
+    console.error('❌ Analytics error:', err.message);
     res.status(500).json({ success: false });
   }
 });
@@ -92,7 +96,7 @@ app.post('/api/reviews', async (req, res) => {
 
     await new Review({
       name,
-      role,
+      role: role || '',
       message,
       rating: rating || 5,
       approved: false,
@@ -100,7 +104,7 @@ app.post('/api/reviews', async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error('Review error:', err.message);
+    console.error('❌ Review error:', err.message);
     res.status(500).json({ success: false });
   }
 });
@@ -110,14 +114,20 @@ app.get('/api/reviews', async (req, res) => {
     const Review = (await import('./models/Review.js')).default;
     const reviews = await Review.find({ approved: true }).sort({ timestamp: -1 });
     res.json({ success: true, data: reviews });
-  } catch (err) {
+  } catch {
     res.status(500).json({ success: false });
   }
 });
 
 /* ================================
-   Start
+   START SERVER — RENDER SAFE
 ================================ */
+const PORT = process.env.PORT;
+
+if (!PORT) {
+  throw new Error('❌ PORT not provided by Render');
+}
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log('🚀 Server running on Render-assigned port');
 });
