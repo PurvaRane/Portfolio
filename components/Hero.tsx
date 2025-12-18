@@ -7,11 +7,11 @@ const Hero: React.FC = () => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full -z-10"></div>
       
       <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 p-1 mb-8 shadow-2xl">
-        <img 
-          src="./components/profile.jpg" 
-          alt="Purva Rane" 
-          className="w-full h-full rounded-full object-cover border-4 border-slate-950"
-        />
+       <img 
+  src="/profile.jpg"
+  alt="Purva Rane" 
+  className="w-full h-full rounded-full object-cover border-4 border-slate-950"
+/>
 
       </div>
 
