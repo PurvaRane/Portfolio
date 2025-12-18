@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
         {/* Desktop Buttons */}
         <div className="hidden lg:flex gap-3">
           <a 
-            href="/public/resume.pdf"
+            href="/resume.pdf"
             download="Purva_Rane_Resume.pdf"
             className="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-full text-sm font-semibold transition shadow-lg shadow-slate-500/20"
           >

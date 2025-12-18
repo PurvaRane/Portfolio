@@ -98,7 +98,7 @@ const App: React.FC = () => {
 
               {/* LinkedIn */}
               <a 
-                href="https://www.linkedin.com/in/purva-rane" 
+                href="https://www.linkedin.com/in/purva-rane26/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-blue-500 p-4 rounded-lg transition-all group"

@@ -1,6 +1,10 @@
 // Analytics service for tracking page views
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  console.warn("⚠️ VITE_API_URL is missing! Analytics may not work.");
+}
 
 interface AnalyticsData {
   page?: string;

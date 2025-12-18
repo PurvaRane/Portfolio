@@ -6,39 +6,58 @@ import Analytics from './models/Analytics.js';
 
 dotenv.config();
 
+const PORT = process.env.PORT || 5000;
 const app = express();
 
 /* =========================
-   CORS — FINAL FIX
+   CORS — PRODUCTION FIX
    ========================= */
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://purvaraneportfolio.vercel.app'
-  ],
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allowed domains (localhost + production)
+    const allowedDomains = [
+      'http://localhost:5173',
+      'http://localhost:3000'
+    ];
+    
+    // Check if origin is in allowedDomains or is a Vercel deployment
+    const isAllowed = allowedDomains.includes(origin) || origin.endsWith('.vercel.app');
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.log('❌ Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-// 🔥 THIS LINE FIXES THE CORS ERROR
+// Explicitly handle preflight requests
 app.options('*', cors());
 
 app.use(express.json());
 
 /* =========================
-   MongoDB
+   MongoDB Connection
    ========================= */
 const connectDB = async () => {
   try {
     if (!process.env.MONGODB_URI) {
-      console.log('⚠️ MongoDB URI not found');
+      console.error('❌ MONGODB_URI is missing in environment variables');
       return;
     }
+    
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ MongoDB connected');
+    console.log('✅ MongoDB connected successfully');
   } catch (err) {
-    console.error('❌ MongoDB error:', err.message);
+    console.error('❌ MongoDB connection error:', err.message);
+    // Don't exit process, allow server to run (analytics might fail but site shouldn't crash)
   }
 };
 
@@ -100,10 +119,8 @@ app.get('/api/reviews', async (req, res) => {
 });
 
 /* =========================
-   START SERVER (Render SAFE)
+   START SERVER
    ========================= */
-const PORT = process.env.PORT;
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

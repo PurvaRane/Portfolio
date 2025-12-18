@@ -1,6 +1,10 @@
-// Reviews service for submitting and fetching reviews
+/// <reference types="vite/client" />
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  console.error("⚠️ VITE_API_URL is missing! Requests will fail.");
+}
 
 interface ReviewData {
   name: string;
@@ -15,8 +19,6 @@ export const submitReview = async (data: ReviewData): Promise<boolean> => {
       console.error('❌ VITE_API_URL is not defined');
       return false;
     }
-
-    console.log('🚀 Submitting review to:', `${API_URL}/api/reviews`);
 
     const response = await fetch(`${API_URL}/api/reviews`, {
       method: 'POST',
@@ -35,40 +37,24 @@ export const submitReview = async (data: ReviewData): Promise<boolean> => {
 
 export const getApprovedReviews = async () => {
   try {
-    if (!API_URL) {
-      console.error('❌ VITE_API_URL is not defined');
-      return [];
-    }
+    if (!API_URL) return [];
 
     const response = await fetch(`${API_URL}/api/reviews`);
-    if (!response.ok) {
-      return [];
-    }
-
     const result = await response.json();
     return result.data || [];
-  } catch (error) {
-    console.error('❌ Error fetching reviews:', error);
+  } catch {
     return [];
   }
 };
 
 export const getAllReviews = async () => {
   try {
-    if (!API_URL) {
-      console.error('❌ VITE_API_URL is not defined');
-      return [];
-    }
+    if (!API_URL) return [];
 
     const response = await fetch(`${API_URL}/api/reviews/all`);
-    if (!response.ok) {
-      return [];
-    }
-
     const result = await response.json();
     return result.data || [];
-  } catch (error) {
-    console.error('❌ Error fetching all reviews:', error);
+  } catch {
     return [];
   }
 };

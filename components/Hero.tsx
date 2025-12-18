@@ -39,7 +39,7 @@ const Hero: React.FC = () => {
         <a href="#projects" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-xl shadow-blue-500/20">
           View Projects
         </a>
-        <a href="https://www.linkedin.com/in/purva-rane" target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-lg font-bold transition-all border border-slate-700">
+        <a href="https://www.linkedin.com/in/purva-rane26/" target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-lg font-bold transition-all border border-slate-700">
           LinkedIn
         </a>
       </div>
