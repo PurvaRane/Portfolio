@@ -42,6 +42,13 @@ const Hero: React.FC = () => {
         <a href="https://www.linkedin.com/in/purva-rane26/" target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-lg font-bold transition-all border border-slate-700">
           LinkedIn
         </a>
+        <a 
+          href="/resume.pdf"
+          download="Purva_Rane_Resume.pdf"
+          className="sm:hidden bg-slate-700 hover:bg-slate-600 text-white px-8 py-3 rounded-lg font-bold transition-all border border-slate-600"
+        >
+          Download Resume
+        </a>
       </div>
     </div>
   );

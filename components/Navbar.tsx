@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-950/80 backdrop-blur-md py-3 shadow-xl border-b border-slate-800' : 'bg-transparent py-6'}`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled || mobileMenuOpen ? 'bg-slate-950 shadow-xl border-b border-slate-800 py-3' : 'bg-transparent py-6'}`}>
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         <a href="#" className="text-xl md:text-2xl font-bold tracking-tight text-white">
           PURVA<span className="text-blue-500">RANE</span>
