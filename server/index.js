@@ -99,7 +99,7 @@ app.post('/api/reviews', async (req, res) => {
       role: role || '',
       message,
       rating: rating || 5,
-      approved: false,
+      approved: true,
     }).save();
 
     res.json({ success: true });
